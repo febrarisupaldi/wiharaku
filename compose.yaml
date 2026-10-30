@@ -1,0 +1,46 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wiharaku_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - wiharaku_network
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: wiharaku_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - wiharaku_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: wiharaku_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - wiharaku_network
+    restart: unless-stopped
+
+networks:
+  wiharaku_network:
+    driver: bridge
+
+volumes:
+  redis_data:
