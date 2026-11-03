@@ -12,6 +12,7 @@ RUN set -eux; \
     curl \
     unzip \
     zip \
+    procps \
     libicu-dev \
     libzip-dev; \
     rm -rf /var/lib/apt/lists/*
