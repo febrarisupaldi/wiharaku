@@ -44,7 +44,7 @@ class RegionRepository
                 fn($query, $search) =>
                 $query->where('c.name', 'like', "%{$search}%")
             )
-            ->orderBy('c.name')
+            ->orderBy('c.city_name')
             ->get();
     }
 

@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\CityController;
-use App\Http\Controllers\Api\DistrictController;
-use App\Http\Controllers\Api\ProvinceController;
+use App\Http\Controllers\Api\Region\CityController;
+use App\Http\Controllers\Api\Region\DistrictController;
+use App\Http\Controllers\Api\Region\ProvinceController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\RegionController;
-use App\Http\Controllers\Api\SubdistrictController;
-use App\Http\Controllers\Api\ViharaController;
+use App\Http\Controllers\Api\Region\SubdistrictController;
+use App\Http\Controllers\Api\Vihara\ViharaController;
+use App\Http\Controllers\Api\Vihara\ViharaSearchController;
 
 Route::prefix('v1')->group(function () {
 
@@ -19,17 +19,17 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/cities', [
             CityController::class,
-            'getCities'
+            'index'
         ]);
 
         Route::get('/districts', [
             DistrictController::class,
-            'getDistricts'
+            'index'
         ]);
 
         Route::get('/subdistricts', [
             SubdistrictController::class,
-            'getSubdistricts'
+            'index'
         ]);
     });
 
@@ -39,6 +39,9 @@ Route::prefix('v1')->group(function () {
             ViharaController::class,
             'index'
         ]);
+        Route::get('/nearby', [ViharaSearchController::class, 'nearby']);
+        Route::get('/radius', [ViharaSearchController::class, 'radius']);
+        Route::get('/map', [ViharaSearchController::class, 'map']);
 
         Route::get('/{id}', [
             ViharaController::class,

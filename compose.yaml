@@ -4,19 +4,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wiharaku_app
+    container_name: kewihara_app
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
     networks:
-      - wiharaku_network
+      - kewihara_network
     depends_on:
       - redis
     restart: unless-stopped
 
   nginx:
     image: nginx:alpine
-    container_name: wiharaku_nginx
+    container_name: kewihara_nginx
     ports:
       - "8080:80"
     volumes:
@@ -25,21 +25,21 @@ services:
     depends_on:
       - app
     networks:
-      - wiharaku_network
+      - kewihara_network
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    container_name: wiharaku_redis
+    container_name: kewihara_redis
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     networks:
-      - wiharaku_network
+      - kewihara_network
     restart: unless-stopped
 
 networks:
-  wiharaku_network:
+  kewihara_network:
     driver: bridge
 
 volumes:

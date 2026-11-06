@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Vihara;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Vihara\StoreViharaRequest;
@@ -8,6 +8,7 @@ use App\Http\Requests\Api\Vihara\UpdateViharaRequest;
 use App\DTOs\Vihara\CreateViharaDTO;
 use App\DTOs\Vihara\UpdateViharaDTO;
 use App\Services\Vihara\ViharaService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ViharaController extends Controller
@@ -16,7 +17,7 @@ class ViharaController extends Controller
         protected ViharaService $service
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $data = $this->service->getAll(
             $request->only([
@@ -34,7 +35,7 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
         $data = $this->service->find($id);
 
@@ -44,7 +45,7 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function store(StoreViharaRequest $request)
+    public function store(StoreViharaRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -66,7 +67,7 @@ class ViharaController extends Controller
     public function update(
         UpdateViharaRequest $request,
         int $id
-    ) {
+    ): JsonResponse {
         $data = $request->validated();
 
         $data['updated_by'] = auth()->id();
@@ -81,7 +82,7 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
         $this->service->delete($id);
 
@@ -91,7 +92,7 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function publish(int $id)
+    public function publish(int $id): JsonResponse
     {
         $this->service->publish($id);
 
@@ -101,7 +102,7 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function unpublish(int $id)
+    public function unpublish(int $id): JsonResponse
     {
         $this->service->unpublish($id);
 

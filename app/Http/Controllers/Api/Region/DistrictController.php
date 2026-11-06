@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Region;
 
 use App\Http\Controllers\Controller;
 use App\Services\Region\RegionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class SubdistrictController extends Controller
+class DistrictController extends Controller
 {
     public function __construct(
         protected RegionService $service
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $data = $this->service->getSubdistricts(
+        $data = $this->service->getDistricts(
             $request->only(['search'])
         );
 

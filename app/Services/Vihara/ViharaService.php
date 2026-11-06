@@ -6,6 +6,7 @@ use App\DTOs\Vihara\CreateViharaDTO;
 use App\DTOs\Vihara\UpdateViharaDTO;
 use App\Repositories\MySQL\RegionRepository;
 use App\Repositories\MySQL\ViharaRepository;
+use App\Services\Support\AuditLogService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -14,7 +15,10 @@ class ViharaService
     public function __construct(
         protected ViharaRepository $repository,
         protected RegionRepository $regionRepository,
-    ) {}
+        protected AuditLogService $auditLogService
+    ) {
+        $auditLogService = $this->auditLogService;
+    }
 
     public function getAll(array $filters = [])
     {
@@ -76,10 +80,18 @@ class ViharaService
                 )
             );
 
+
+
             // Jika nama tidak berubah, slug tidak perlu diubah.
             // Updated_by hanya diubah jika actor tersedia.
 
-            return $this->repository->update($id, $dto);
+            $check = $this->repository->update($id, $dto);
+
+            $newVihara = $this->find($id);
+
+            $this->auditLogService->record('vihara', $id, 'UPDATE', (array) $vihara, (array) $newVihara);
+
+            return $check;
         });
     }
 
