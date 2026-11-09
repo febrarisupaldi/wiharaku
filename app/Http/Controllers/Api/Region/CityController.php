@@ -16,7 +16,7 @@ class CityController extends Controller
     public function index(Request $request): JsonResponse
     {
         $data = $this->service->getCities(
-            $request->only(['search'])
+            $request->only(['search', 'province_id'])
         );
 
         return response()->json([

@@ -36,8 +36,9 @@ class RegionRepository
             ->where('p.is_active', 1)
             ->when(
                 $filters['province_id'] ?? null,
-                fn($query, $id) =>
-                $query->where('c.province_id', $id)
+                function ($query) use ($filters) {
+                    return $query->where('c.province_id', $filters['province_id']);
+                }
             )
             ->when(
                 $filters['search'] ?? null,
