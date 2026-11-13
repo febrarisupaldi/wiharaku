@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Vihara\PublicViharaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,3 +14,5 @@ Route::get('/jelajahi', function () {
 Route::get('/peta', function () {
     return view('pages.map');
 })->name('map');
+Route::get('/vihara/{slug}', [PublicViharaController::class, 'show'])
+    ->name('public.vihara.show');

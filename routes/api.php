@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Region\ProvinceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Region\SubdistrictController;
 use App\Http\Controllers\Api\Vihara\ViharaController;
+use App\Http\Controllers\Api\Vihara\ViharaPhotoController;
 use App\Http\Controllers\Api\Vihara\ViharaSearchController;
 
 Route::prefix('v1')->group(function () {
@@ -33,12 +34,14 @@ Route::prefix('v1')->group(function () {
         ]);
     });
 
+
     // VIHARA
     Route::prefix('viharas')->group(function () {
         Route::get('/', [
             ViharaController::class,
             'index'
         ]);
+
         Route::get('/nearby', [ViharaSearchController::class, 'nearby']);
         Route::get('/radius', [ViharaSearchController::class, 'radius']);
         Route::get('/map', [ViharaSearchController::class, 'map']);
@@ -46,7 +49,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [
             ViharaController::class,
             'show'
-        ])->whereNumber('id');
+        ]);
 
         // Sementara untuk development.
         // Nanti wajib dilindungi middleware admin.
@@ -65,6 +68,21 @@ Route::prefix('v1')->group(function () {
             'destroy'
         ])->whereNumber('id');
 
+        Route::post('/{id}/submit', [
+            ViharaController::class,
+            'submit'
+        ])->whereNumber('id');
+
+        Route::post('/{id}/verify', [
+            ViharaController::class,
+            'verify'
+        ])->whereNumber('id');
+
+        Route::post('/{id}/reject', [
+            ViharaController::class,
+            'reject'
+        ])->whereNumber('id');
+
         Route::post('/{id}/publish', [
             ViharaController::class,
             'publish'
@@ -74,5 +92,30 @@ Route::prefix('v1')->group(function () {
             ViharaController::class,
             'unpublish'
         ])->whereNumber('id');
+
+        Route::get(
+            '/{id}/photos',
+            [ViharaPhotoController::class, 'index']
+        );
+
+        Route::post(
+            '/{id}/photos',
+            [ViharaPhotoController::class, 'store']
+        );
+
+        Route::patch(
+            '{id}/photos/{photoId}/review',
+            [ViharaPhotoController::class, 'review']
+        );
+
+        Route::patch(
+            '{id}/photos/{photoId}/primary',
+            [ViharaPhotoController::class, 'setPrimary']
+        );
+
+        Route::delete(
+            '{id}/photos/{photoId}',
+            [ViharaPhotoController::class, 'destroy']
+        );
     });
 });

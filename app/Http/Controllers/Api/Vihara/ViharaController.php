@@ -35,9 +35,9 @@ class ViharaController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(string $identifier): JsonResponse
     {
-        $data = $this->service->find($id);
+        $data = $this->service->findPublic($identifier);
 
         return response()->json([
             'success' => true,
@@ -79,6 +79,39 @@ class ViharaController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Vihara berhasil diperbarui.',
+        ]);
+    }
+
+    public function submit(
+        int $id
+    ): JsonResponse {
+        $this->service->updateStatus($id, 2);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vihara masuk ke Antrian untuk direview',
+        ]);
+    }
+
+    public function verify(
+        int $id
+    ): JsonResponse {
+        $this->service->updateStatus($id, 3);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vihara berhasil diverifikasi.',
+        ]);
+    }
+
+    public function rejected(
+        int $id
+    ): JsonResponse {
+        $this->service->updateStatus($id, 4);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vihara ditolak statusnya.',
         ]);
     }
 

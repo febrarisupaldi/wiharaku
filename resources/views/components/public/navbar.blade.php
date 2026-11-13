@@ -1,15 +1,15 @@
-<header class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
+<header class="sticky top-0 z-[1100] z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
     <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex items-center gap-3">
             <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800 text-xl font-bold text-white">
-                W
+                KW
             </div>
 
             <div>
                 <span class="block text-xl font-bold tracking-tight text-emerald-900">
-                    Wiharaku
+                    KeWihara
                 </span>
                 <span class="block text-xs text-gray-500">
                     Temukan Vihara Indonesia

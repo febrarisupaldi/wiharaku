@@ -355,21 +355,14 @@
 
             content.append(name, address, regionElement);
 
-            if (
-                vihara.latitude !== null &&
-                vihara.longitude !== null &&
-                vihara.latitude !== undefined &&
-                vihara.longitude !== undefined
-            ) {
-                const mapLink = document.createElement('a');
+            if (vihara.slug) {
+                const detailLink = document.createElement('a');
 
-                mapLink.href = `https://www.google.com/maps?q=${encodeURIComponent(vihara.latitude)},${encodeURIComponent(vihara.longitude)}`;
-                mapLink.target = '_blank';
-                mapLink.rel = 'noopener noreferrer';
-                mapLink.className = 'mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950';
-                mapLink.textContent = 'Lihat lokasi di peta';
+                detailLink.href = `/vihara/${encodeURIComponent(vihara.slug)}`;
+                detailLink.className = 'mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950';
+                detailLink.textContent = 'Lihat detail vihara';
 
-                content.append(mapLink);
+                content.append(detailLink);
             }
 
             card.append(top, content);

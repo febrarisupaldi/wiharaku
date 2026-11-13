@@ -77,7 +77,7 @@
                 </h2>
 
                 <p id="map-count" class="mt-1 text-sm text-gray-500">
-                    Menyiapkan peta...
+                    Menunggu data vihara...
                 </p>
             </div>
 

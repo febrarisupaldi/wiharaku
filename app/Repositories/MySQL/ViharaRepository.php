@@ -109,26 +109,84 @@ class ViharaRepository
             ->first();
     }
 
-    public function findBySlug(string $slug)
+
+    private function detailQuery()
     {
-        return DB::table('viharas')
-            ->where('slug', $slug)
-            ->whereNull('deleted_at')
+        return DB::table('viharas as v')
+            ->leftJoin('provinces as p', 'p.id', '=', 'v.province_id')
+            ->leftJoin('cities as c', 'c.id', '=', 'v.city_id')
+            ->leftJoin('districts as d', 'd.id', '=', 'v.district_id')
+            ->leftJoin('subdistricts as sd', 'sd.id', '=', 'v.subdistrict_id')
+            ->join(
+                'verification_statuses as vs',
+                'vs.id',
+                '=',
+                'v.verification_status_id'
+            )
+            ->select([
+                'v.*',
+                'p.province_name',
+                'c.city_name',
+                'd.district_name',
+                'sd.subdistrict_name',
+                'vs.code as verification_status',
+            ]);
+    }
+
+    /**
+     * Pencarian internal berdasarkan ID atau slug.
+     * Tidak membatasi status publikasi.
+     */
+    public function findByIdentifier(string $identifier): ?object
+    {
+        $query = $this->detailQuery();
+
+        if (ctype_digit($identifier)) {
+            $query->where('v.id', (int) $identifier);
+        } else {
+            $query->where('v.slug', $identifier);
+        }
+
+        return $query
+            ->whereNull('v.deleted_at')
             ->first();
     }
 
+    /**
+     * Pencarian khusus website publik.
+     * Hanya vihara aktif dan terverifikasi.
+     */
+    public function findPublicByIdentifier(string $identifier): ?object
+    {
+        $query = $this->detailQuery();
+
+        if (ctype_digit($identifier)) {
+            $query->where('v.id', (int) $identifier);
+        } else {
+            $query->where('v.slug', $identifier);
+        }
+
+        return $query
+            ->where('v.is_active', 1)
+            ->where('vs.code', 'verified')
+            ->whereNull('v.deleted_at')
+            ->first();
+    }
+
+
     public function create(CreateViharaDTO $dto): int
     {
-        return (int) DB::table('viharas')->insertGetId([
-            'slug' => $this->generateSlug($dto->name),
-            ...$dto->toArray(),
-            'verification_status_id' => DB::table(
-                'verification_statuses'
-            )->where('code', 'unverified')->value('id'),
-            'is_active' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        return (int) DB::table('viharas')
+            ->insertGetId([
+                'slug' => $this->generateSlug($dto->name),
+                ...$dto->toArray(),
+                'verification_status_id' => DB::table(
+                    'verification_statuses'
+                )->where('code', 'unverified')->value('id'),
+                'is_active' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
     }
 
     public function update(
@@ -162,6 +220,32 @@ class ViharaRepository
                 'is_active' => 0,
                 'updated_at' => now(),
             ]) > 0;
+    }
+
+    public function updateStatus(
+        int $id,
+        int $verificationStatus
+    ): bool {
+
+        if ($verificationStatus != 3) {
+
+            return DB::table('viharas')
+                ->where('id', $id)
+                ->whereNull('deleted_at')
+                ->update([
+                    'verification_status_id' => $verificationStatus,
+                    'updated_at' => now(),
+                ]) > 0;
+        } else {
+            return DB::table('viharas')
+                ->where('id', $id)
+                ->whereNull('deleted_at')
+                ->update([
+                    'verified_at' => DB::raw('now()'),
+                    'verification_status_id' => $verificationStatus,
+                    'updated_at' => now(),
+                ]) > 0;
+        }
     }
 
     public function updatePublication(
@@ -271,14 +355,18 @@ class ViharaRepository
             });
         }
 
-        // Batas area geografis
-        if ($mode === 'map') {
+        // Batas area geografis.
+        // Pencarian keyword pada mode map bersifat global.
+        if (
+            $mode === 'map' &&
+            empty($filters['keyword'])
+        ) {
             $query->whereBetween('v.latitude', [
                 $filters['south'],
                 $filters['north'],
             ]);
 
-            // Menangani area yang melintasi garis bujur 180 derajat
+            // Menangani area yang melintasi garis bujur 180 derajat.
             if ($filters['west'] <= $filters['east']) {
                 $query->whereBetween('v.longitude', [
                     $filters['west'],

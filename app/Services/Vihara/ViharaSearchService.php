@@ -26,10 +26,25 @@ class ViharaSearchService
 
     public function map(array $filters)
     {
-        if ($filters['south'] >= $filters['north']) {
-            throw ValidationException::withMessages([
-                'bounds' => 'South harus lebih kecil daripada north.',
-            ]);
+        if (empty($filters['keyword'])) {
+            if (
+                !isset(
+                    $filters['south'],
+                    $filters['north'],
+                    $filters['west'],
+                    $filters['east']
+                )
+            ) {
+                throw ValidationException::withMessages([
+                    'bounds' => 'Parameter bounding box wajib diisi.',
+                ]);
+            }
+
+            if ($filters['south'] >= $filters['north']) {
+                throw ValidationException::withMessages([
+                    'bounds' => 'South harus lebih kecil daripada north.',
+                ]);
+            }
         }
 
         return $this->repository->search($filters, 'map');

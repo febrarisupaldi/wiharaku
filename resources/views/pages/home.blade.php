@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Wiharaku - Temukan Vihara di Indonesia')
+@section('title', 'KeWihara - Temukan Vihara di Indonesia')
 
 @section('description', 'Temukan vihara di seluruh Indonesia. Jelajahi lokasi, informasi, dan kegiatan vihara melalui Wiharaku.')
 

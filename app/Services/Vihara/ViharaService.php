@@ -14,6 +14,8 @@ class ViharaService
 {
     public function __construct(
         protected ViharaRepository $repository,
+        protected ViharaPhotoService $viharaPhotoService,
+        protected ViharaTraditionService $viharaTraditionService,
         protected RegionRepository $regionRepository,
         protected AuditLogService $auditLogService
     ) {
@@ -25,18 +27,42 @@ class ViharaService
         return $this->repository->getAll($filters);
     }
 
-    public function find(int $id)
+    public function find(string $identifier): ?object
     {
-        $vihara = $this->repository->findById($id);
+        $vihara = $this->repository
+            ->findByIdentifier($identifier);
 
         if (!$vihara) {
-            throw ValidationException::withMessages([
-                'vihara' => 'Data vihara tidak ditemukan.',
-            ]);
+            return null;
         }
+
+        $vihara->photos = $this->viharaPhotoService
+            ->getApprovedPhotos((int) $vihara->id);
+
+        $vihara->traditions = $this->viharaTraditionService->getTraditionsByViharaId((int) $vihara->id);
 
         return $vihara;
     }
+
+
+    public function findPublic(string $identifier): object
+    {
+        $vihara = $this->repository->findPublicByIdentifier($identifier);
+
+        abort_if(
+            !$vihara,
+            404,
+            'Data vihara tidak ditemukan.'
+        );
+
+        $vihara->photos = $this->viharaPhotoService
+            ->getApprovedPhotos((int) $vihara->id);
+
+        $vihara->traditions = $this->viharaTraditionService->getTraditionsByViharaId((int) $vihara->id);
+
+        return $vihara;
+    }
+
 
     public function create(CreateViharaDTO $dto): int
     {
@@ -102,6 +128,27 @@ class ViharaService
         return DB::transaction(
             fn() => $this->repository->delete($id)
         );
+    }
+
+    public function updateStatus(int $id, int $statusId): bool
+    {
+        return DB::transaction(function () use ($id, $statusId) {
+            $vihara = $this->find($id);
+
+            if (
+                $vihara->latitude === null ||
+                $vihara->longitude === null
+            ) {
+                throw ValidationException::withMessages([
+                    'coordinates' => 'Koordinat wajib diisi.',
+                ]);
+            }
+
+            return $this->repository->updateStatus(
+                $id,
+                $statusId
+            );
+        });
     }
 
     public function publish(int $id): bool

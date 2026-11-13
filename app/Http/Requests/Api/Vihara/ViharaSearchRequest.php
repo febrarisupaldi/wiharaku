@@ -16,10 +16,12 @@ class ViharaSearchRequest extends FormRequest
         return [
             'latitude' => [
                 'required_with:longitude',
+                'numeric',
                 'between:-90,90',
             ],
             'longitude' => [
                 'required_with:latitude',
+                'numeric',
                 'between:-180,180',
             ],
 
